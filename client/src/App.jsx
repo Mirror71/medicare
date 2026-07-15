@@ -15,8 +15,8 @@ export default function App() {
   return (
     <div
       className={
-        'min-h-screen bg-[var(--color-bg)] text-[var(--color-text)] ' +
-        (navVisible ? 'pb-36' : 'pb-24')
+        'min-h-screen bg-bg text-text ' +
+        (navVisible ? 'pb-[calc(8.5rem+env(safe-area-inset-bottom))]' : 'pb-24')
       }
     >
       <Routes>

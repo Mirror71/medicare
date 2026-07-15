@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMedication } from "../store/MedicationContext";
 import PhotoCapture from "../components/PhotoCapture";
+import { Camera, X } from "lucide-react";
 import { callGemma } from "../lib/apiClient";
 
 // ─── Options ────────────────────────────────────────────────────────────────
@@ -288,24 +289,24 @@ export default function AddEditMedication() {
         </div>
       )}
       {photoState === "photo_prefilled" && (
-        <div className="mb-5 rounded-xl border-l-4 border-[var(--color-primary)] bg-[#EFF6FF] px-4 py-3 text-[var(--color-text)]">
-          📷 We read these from your photo — please check and correct anything
-          that's wrong.
+        <div className="mb-5 flex items-start gap-2 rounded-2xl border-l-4 border-primary bg-primary/10 px-4 py-3 text-text">
+          <Camera size={20} className="mt-0.5 shrink-0 text-primary" />
+          <span>We read these from your photo — please check and correct anything that's wrong.</span>
         </div>
       )}
       {photoState === "photo_uncertain" && (
-        <div className="mb-5 flex items-start justify-between gap-3 rounded-xl border-l-4 border-[var(--color-caution)] bg-[#FFFBEB] px-4 py-3 text-[var(--color-caution)]">
-          <span>
-            📷 We couldn't read this clearly — please enter the details
-            yourself.
+        <div className="mb-5 flex items-start justify-between gap-3 rounded-2xl border-l-4 border-caution bg-caution/10 px-4 py-3 text-caution">
+          <span className="flex items-start gap-2">
+            <Camera size={20} className="mt-0.5 shrink-0" />
+            We couldn't read this clearly — please enter the details yourself.
           </span>
           <button
             type="button"
             aria-label="Dismiss"
             onClick={() => setPhotoState("normal")}
-            className="shrink-0 text-xl leading-none text-[var(--color-caution)]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center text-caution"
           >
-            ✕
+            <X size={20} />
           </button>
         </div>
       )}
@@ -322,10 +323,10 @@ export default function AddEditMedication() {
           <button
             type="button"
             disabled={disabled}
-            className="mb-6 w-full rounded-xl border-2 border-[var(--color-primary)] bg-white px-4 py-3 text-lg font-semibold text-[var(--color-primary)] disabled:opacity-60"
+            className="mb-6 flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-surface px-4 py-3 text-lg font-semibold text-primary disabled:opacity-60"
             onClick={() => setShowCapture(true)}
           >
-            📷 Add by photo
+            <Camera size={22} /> Add by photo
           </button>
         ))}
 

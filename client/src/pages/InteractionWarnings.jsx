@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { useMedication, PATIENT_ID } from "../store/MedicationContext";
 import { supabase } from "../lib/supabase";
 import { callGemma } from "../lib/apiClient";
@@ -134,9 +135,9 @@ export default function InteractionWarnings() {
     <main className="mx-auto max-w-2xl px-4 py-6">
       <Link
         to="/dashboard"
-        className="inline-block min-h-12 py-2 text-lg text-[var(--color-primary)] underline"
+        className="inline-flex min-h-12 items-center gap-1.5 py-2 text-lg text-primary"
       >
-        ← Back to my medicines
+        <ArrowLeft size={20} /> Back to my medicines
       </Link>
 
       <h1 className="mt-2 text-3xl font-bold text-[var(--color-primary)]">

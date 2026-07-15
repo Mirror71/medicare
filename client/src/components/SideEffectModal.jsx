@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { X, Flag, Info } from 'lucide-react'
 import { callGemma } from '../lib/apiClient'
 import UncertainCard from './UncertainCard'
 
@@ -10,8 +11,8 @@ function EffectItem({ item, redFlag }) {
         (redFlag ? 'border-l-4 border-l-[var(--color-danger)] bg-[#FEF2F2]' : 'border-slate-200 bg-white')
       }
     >
-      <div className="text-lg font-semibold">
-        {redFlag && <span aria-hidden="true">🚩 </span>}
+      <div className="flex items-center gap-2 text-lg font-semibold">
+        {redFlag && <Flag size={18} className="shrink-0 text-danger" />}
         {item.effect}
       </div>
       {item.plainLanguage && (
@@ -79,9 +80,9 @@ export default function SideEffectModal({ medicationName, onClose }) {
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-2xl text-slate-500 hover:bg-slate-100"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-uncertain-text hover:bg-border/40"
           >
-            ✕
+            <X size={24} />
           </button>
         </div>
 
@@ -147,8 +148,9 @@ export default function SideEffectModal({ medicationName, onClose }) {
         </div>
 
         {/* Footer disclaimer */}
-        <div className="border-t border-slate-200 bg-white px-4 py-3 text-center text-base text-[var(--color-uncertain-text)]">
-          ℹ️ Informational only — not medical advice. Always check with your doctor or pharmacist.
+        <div className="flex items-center justify-center gap-2 border-t border-border bg-surface px-4 py-3 text-center text-base text-uncertain-text">
+          <Info size={18} className="shrink-0" />
+          <span>Informational only — not medical advice. Always check with your doctor or pharmacist.</span>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { ArrowLeft, Send, Pill } from 'lucide-react'
 import { mockRotation } from '../mocks/symptoms'
 
 function nowTime() {
@@ -60,8 +61,8 @@ export default function SymptomChat() {
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pt-6 pb-44">
       {/* Header */}
       <div>
-        <Link to="/dashboard" className="inline-block min-h-12 py-2 text-lg text-[var(--color-primary)] underline">
-          ← Back to my medicines
+        <Link to="/dashboard" className="inline-flex min-h-12 items-center gap-1.5 py-2 text-lg text-primary">
+          <ArrowLeft size={20} /> Back to my medicines
         </Link>
         <h1 className="mt-1 text-3xl font-bold text-[var(--color-primary)]">How are you feeling?</h1>
         <p className="mt-1 text-lg text-[var(--color-uncertain-text)]">
@@ -109,9 +110,9 @@ export default function SymptomChat() {
             onClick={send}
             disabled={!input.trim() || typing}
             aria-label="Send"
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--color-primary)] text-2xl text-white disabled:opacity-50"
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary text-white shadow-md transition-transform active:scale-95 disabled:opacity-50"
           >
-            ➤
+            <Send size={22} />
           </button>
         </div>
       </div>
@@ -163,8 +164,8 @@ function AssistantMessage({ msg }) {
         )}
 
         {data.possibleRelatedMedication && (
-          <div className="mt-2 inline-block rounded-full bg-[#EFF6FF] px-3 py-1 text-base text-[var(--color-primary)]">
-            💊 Possibly related to: {data.possibleRelatedMedication}
+          <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-base text-primary">
+            <Pill size={16} /> Possibly related to: {data.possibleRelatedMedication}
           </div>
         )}
 

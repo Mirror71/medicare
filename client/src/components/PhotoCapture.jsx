@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Camera, Image as ImageIcon, Check, RotateCcw } from 'lucide-react'
 
 const MAX_SIDE = 1024
 const JPEG_QUALITY = 0.8
@@ -135,14 +136,14 @@ export default function PhotoCapture({ onCaptureComplete, onCancel }) {
               onClick={() => cameraRef.current?.click()}
               className={`${bigBtn} bg-[var(--color-primary)] text-white`}
             >
-              📷 Take a photo
+              <Camera size={22} /> Take a photo
             </button>
             <button
               type="button"
               onClick={() => galleryRef.current?.click()}
               className={`${bigBtn} border-2 border-[var(--color-primary)] bg-white text-[var(--color-primary)]`}
             >
-              🖼️ Choose from gallery
+              <ImageIcon size={22} /> Choose from gallery
             </button>
           </div>
           <p className="text-center text-base text-[var(--color-uncertain-text)]">
@@ -181,14 +182,14 @@ export default function PhotoCapture({ onCaptureComplete, onCancel }) {
                 onClick={useThisPhoto}
                 className={`${bigBtn} bg-[var(--color-primary)] text-white`}
               >
-                ✓ Use this photo
+                <Check size={22} /> Use this photo
               </button>
               <button
                 type="button"
                 onClick={retake}
                 className={`${bigBtn} border-2 border-slate-300 bg-white text-[var(--color-text)]`}
               >
-                ↻ Retake
+                <RotateCcw size={22} /> Retake
               </button>
             </div>
           )}

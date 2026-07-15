@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Check, Clock, Utensils, MoreVertical, AlertTriangle, Pill, Activity, Pencil, Trash2 } from 'lucide-react'
 import { useMedication } from '../store/MedicationContext'
 import SideEffectModal from './SideEffectModal'
 
 const FOOD_LABELS = {
-  before_food: '⏱️ Before food',
-  with_food: '🍽️ With food',
-  after_food: '🍽️ After food',
+  before_food: 'Before food',
+  with_food: 'With food',
+  after_food: 'After food',
   no_preference: null,
 }
 
@@ -26,7 +27,6 @@ export default function MedCard({ slot, overdue }) {
   const [showSideEffects, setShowSideEffects] = useState(false)
   const menuRef = useRef(null)
 
-  // Close the overflow menu on outside click / Escape.
   useEffect(() => {
     if (!menuOpen) return
     const onClick = (e) => {
@@ -64,9 +64,12 @@ export default function MedCard({ slot, overdue }) {
   const foodLabel = FOOD_LABELS[med.food_relation]
 
   const cardCls = [
-    'relative flex items-center gap-3 rounded-2xl border p-4 shadow-sm transition-colors',
-    taken ? 'border-green-200 bg-[#F0FDF4]' : 'border-slate-200 bg-white',
-    overdue && !taken ? 'border-l-4 border-l-[var(--color-danger)]' : '',
+    'relative flex items-center gap-3 rounded-3xl p-5 shadow-sm transition-colors duration-300',
+    taken
+      ? 'bg-safe/5 border-l-[5px] border-safe'
+      : overdue
+        ? 'bg-surface border-l-[5px] border-danger'
+        : 'bg-surface',
   ].join(' ')
 
   return (
@@ -76,19 +79,21 @@ export default function MedCard({ slot, overdue }) {
         <div className="flex items-center gap-2">
           <span className="truncate text-xl font-bold">{med.name}</span>
           {overdue && !taken && (
-            <span className="shrink-0 rounded-full bg-red-50 px-2 py-0.5 text-base font-semibold text-[var(--color-danger)]">
-              Missed
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-danger/10 px-2.5 py-1 text-base font-semibold text-danger">
+              <AlertTriangle size={16} /> Missed
             </span>
           )}
         </div>
-        <div className="mt-0.5 text-lg text-[var(--color-uncertain-text)]">
+        <div className="mt-0.5 text-lg text-uncertain-text">
           {med.dosage_amount} {med.dosage_unit}
         </div>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <span className="text-base font-medium text-slate-500">🕒 {timeStr}</span>
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-border/40 px-3 py-1 text-base font-medium text-uncertain-text">
+            <Clock size={16} /> {timeStr}
+          </span>
           {foodLabel && (
-            <span className="rounded-full bg-slate-100 px-2.5 py-1 text-base text-slate-600">
-              {foodLabel}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-border/40 px-3 py-1 text-base text-uncertain-text">
+              <Utensils size={16} /> {foodLabel}
             </span>
           )}
         </div>
@@ -103,13 +108,13 @@ export default function MedCard({ slot, overdue }) {
         disabled={busy}
         onClick={handleToggle}
         className={[
-          'flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 text-2xl transition-colors disabled:opacity-60',
+          'flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 disabled:opacity-60',
           taken
-            ? 'border-[var(--color-safe)] bg-[var(--color-safe)] text-white'
-            : 'border-slate-300 bg-white text-transparent',
+            ? 'border-safe bg-safe text-white ring-4 ring-safe/20'
+            : 'border-border bg-surface text-border hover:border-safe/50 active:scale-95',
         ].join(' ')}
       >
-        ✓
+        <Check size={30} strokeWidth={3} />
       </button>
 
       {/* Overflow menu */}
@@ -120,47 +125,27 @@ export default function MedCard({ slot, overdue }) {
           aria-haspopup="menu"
           aria-expanded={menuOpen}
           onClick={() => setMenuOpen((o) => !o)}
-          className="flex h-12 w-12 items-center justify-center rounded-full text-2xl text-slate-500 hover:bg-slate-100"
+          className="flex h-12 w-12 items-center justify-center rounded-full text-uncertain-text hover:bg-border/40"
         >
-          ⋯
+          <MoreVertical size={24} />
         </button>
         {menuOpen && (
           <div
             role="menu"
-            className="absolute right-0 top-14 z-20 w-60 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+            className="absolute right-0 top-14 z-20 w-64 overflow-hidden rounded-2xl border border-border bg-surface py-1 shadow-lg"
           >
-            <button
-              type="button"
-              role="menuitem"
-              className="block w-full px-4 py-3 text-left text-base hover:bg-slate-50"
-              onClick={() => { setMenuOpen(false); setShowSideEffects(true) }}
-            >
+            <MenuItem icon={Pill} onClick={() => { setMenuOpen(false); setShowSideEffects(true) }}>
               Learn about side effects
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className="block w-full px-4 py-3 text-left text-base hover:bg-slate-50"
-              onClick={() => { setMenuOpen(false); navigate(`/dashboard/interactions?focus=${med.id}`) }}
-            >
+            </MenuItem>
+            <MenuItem icon={Activity} onClick={() => { setMenuOpen(false); navigate(`/dashboard/interactions?focus=${med.id}`) }}>
               Check interactions
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className="block w-full px-4 py-3 text-left text-base hover:bg-slate-50"
-              onClick={() => { setMenuOpen(false); navigate(`/edit/${med.id}`) }}
-            >
+            </MenuItem>
+            <MenuItem icon={Pencil} onClick={() => { setMenuOpen(false); navigate(`/edit/${med.id}`) }}>
               Edit
-            </button>
-            <button
-              type="button"
-              role="menuitem"
-              className="block w-full px-4 py-3 text-left text-base text-[var(--color-danger)] hover:bg-red-50"
-              onClick={handleDelete}
-            >
+            </MenuItem>
+            <MenuItem icon={Trash2} danger onClick={handleDelete}>
               Delete
-            </button>
+            </MenuItem>
           </div>
         )}
       </div>
@@ -172,5 +157,22 @@ export default function MedCard({ slot, overdue }) {
         />
       )}
     </div>
+  )
+}
+
+function MenuItem({ icon: Icon, children, onClick, danger }) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      onClick={onClick}
+      className={
+        'flex w-full items-center gap-3 px-4 py-3 text-left text-base ' +
+        (danger ? 'text-danger hover:bg-danger/5' : 'hover:bg-border/30')
+      }
+    >
+      <Icon size={20} className="shrink-0" />
+      {children}
+    </button>
   )
 }

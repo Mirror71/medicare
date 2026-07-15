@@ -1,18 +1,22 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #F8FAFC;
-  --color-text: #0F172A;
-  --color-primary: #0369A1;
-  --color-safe: #15803D;
-  --color-caution: #B45309;
-  --color-danger: #B91C1C;
-  --color-uncertain: #6366F1;
-  --color-uncertain-text: #475569;
+  --color-bg: #FAFAF8;            /* warm off-white */
+  --color-surface: #FFFFFF;       /* card surfaces */
+  --color-text: #1A1A1A;          /* softened near-black */
+  --color-primary: #0F766E;       /* calming teal (AA-safe on white) */
+  --color-primary-light: #CCFBF1; /* light teal for tinted backgrounds */
+  --color-safe: #16A34A;
+  --color-caution: #D97706;
+  --color-danger: #DC2626;
+  --color-uncertain: #7C3AED;
+  --color-uncertain-text: #64748B;
+  --color-border: #E8E6E1;        /* warm border */
 }
 
 html {
   font-size: 18px;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -20,8 +24,11 @@ body {
   font-size: 18px;
   line-height: 1.6;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
+/* Elderly-friendly minimum tap target */
 button,
 a[role="button"],
 input[type="button"],
@@ -30,4 +37,24 @@ select,
 [role="button"] {
   min-height: 48px;
   min-width: 48px;
+}
+
+*:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--color-primary-light);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
 }

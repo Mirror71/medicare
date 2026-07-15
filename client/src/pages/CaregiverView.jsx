@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { Eye, ArrowLeft, AlertTriangle, AlertOctagon, HelpCircle, ShieldCheck, Copy, Check } from 'lucide-react'
 import { useMedication } from '../store/MedicationContext'
 
 const SECTION_KEYS = ['Morning', 'Afternoon', 'Evening', 'Night']
@@ -11,7 +12,7 @@ const FOOD_LABELS = {
   no_preference: 'any time',
 }
 
-const STATUS_ICON = { danger: '🛑', caution: '⚠️', uncertain: '❓', safe: '✅' }
+const STATUS_ICON = { danger: AlertOctagon, caution: AlertTriangle, uncertain: HelpCircle, safe: ShieldCheck }
 const STATUS_COLOR = {
   danger: 'var(--color-danger)',
   caution: 'var(--color-caution)',
@@ -133,7 +134,7 @@ export default function CaregiverView() {
       {/* Header */}
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--color-primary)]">👁️ Caregiver View</h1>
+          <h1 className="flex items-center gap-2 text-3xl font-bold text-primary"><Eye size={30} /> Caregiver View</h1>
           <p className="mt-1 text-lg text-[var(--color-uncertain-text)]">{shortDate()}</p>
         </div>
         <span className="mt-1 inline-flex shrink-0 items-center gap-2 rounded-full bg-green-50 px-3 py-1 text-base font-semibold text-[var(--color-safe)]">
@@ -142,8 +143,8 @@ export default function CaregiverView() {
         </span>
       </div>
 
-      <Link to="/dashboard" className="mt-3 inline-block min-h-12 py-2 text-lg text-[var(--color-primary)] underline">
-        ← Back to my medicines
+      <Link to="/dashboard" className="mt-3 inline-flex min-h-12 items-center gap-1.5 py-2 text-lg text-primary">
+        <ArrowLeft size={20} /> Back to my medicines
       </Link>
 
       {loading ? (
@@ -173,7 +174,7 @@ export default function CaregiverView() {
           {/* Missed doses */}
           {missedDoses.length > 0 && (
             <section className="mt-4 rounded-2xl border-l-4 border-[var(--color-danger)] bg-[#FEF2F2] p-4">
-              <h2 className="text-xl font-bold text-[var(--color-danger)]">⚠ Missed doses</h2>
+              <h2 className="flex items-center gap-2 text-xl font-bold text-danger"><AlertTriangle size={22} /> Missed doses</h2>
               <ul className="mt-2 flex flex-col gap-1">
                 {missedDoses.map((s) => (
                   <li key={`${s.med.id}-${s.scheduledAtISO}`} className="text-lg">
@@ -187,28 +188,32 @@ export default function CaregiverView() {
           {/* Interaction warnings */}
           {activeWarnings.length > 0 && (
             <section className="mt-4">
-              <h2 className="mb-2 text-xl font-bold">⚠ Interaction warnings ({activeWarnings.length})</h2>
+              <h2 className="mb-2 flex items-center gap-2 text-xl font-bold"><AlertTriangle size={22} /> Interaction warnings ({activeWarnings.length})</h2>
               <div className="flex flex-col gap-2">
-                {activeWarnings.map((w) => (
-                  <div
-                    key={w.id}
-                    className="flex items-start gap-3 rounded-xl border-l-4 bg-white p-3 shadow-sm"
-                    style={{ borderColor: STATUS_COLOR[w.status] ?? STATUS_COLOR.uncertain }}
-                  >
-                    <span className="text-2xl" aria-hidden="true">{STATUS_ICON[w.status] ?? '❓'}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-bold">{w.drug_a} + {w.drug_b}</span>
-                        {w.status === 'danger' && !w.acknowledged_at && (
-                          <span className="shrink-0 rounded-full bg-red-50 px-2 py-0.5 text-base font-semibold text-[var(--color-danger)]">
-                            Not acknowledged
-                          </span>
-                        )}
+                {activeWarnings.map((w) => {
+                  const Icon = STATUS_ICON[w.status] ?? HelpCircle
+                  const color = STATUS_COLOR[w.status] ?? STATUS_COLOR.uncertain
+                  return (
+                    <div
+                      key={w.id}
+                      className="flex items-start gap-3 rounded-2xl border-l-4 bg-surface p-3 shadow-sm"
+                      style={{ borderColor: color }}
+                    >
+                      <Icon size={24} style={{ color }} className="shrink-0" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold">{w.drug_a} + {w.drug_b}</span>
+                          {w.status === 'danger' && !w.acknowledged_at && (
+                            <span className="shrink-0 rounded-full bg-danger/10 px-2 py-0.5 text-base font-semibold text-danger">
+                              Not acknowledged
+                            </span>
+                          )}
+                        </div>
+                        <p className="truncate text-lg text-uncertain-text">{w.headline}</p>
                       </div>
-                      <p className="truncate text-lg text-[var(--color-uncertain-text)]">{w.headline}</p>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </section>
           )}
@@ -246,9 +251,9 @@ export default function CaregiverView() {
           <button
             type="button"
             onClick={handleCopy}
-            className="mt-6 min-h-12 w-full rounded-xl border-2 border-[var(--color-primary)] bg-white px-4 py-3 text-lg font-semibold text-[var(--color-primary)]"
+            className="mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-primary bg-surface px-4 py-3 text-lg font-semibold text-primary"
           >
-            {copied ? '✓ Copied!' : 'Copy summary'}
+            {copied ? (<><Check size={20} /> Copied!</>) : (<><Copy size={20} /> Copy summary</>)}
           </button>
         </>
       )}
