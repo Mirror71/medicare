@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useMemo, useState } from 'react';
+import { createContext, useContext, useReducer, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { callGemma } from '../lib/apiClient';
 
@@ -126,6 +126,17 @@ export function MedicationProvider({ children }) {
   const [checkingInteractions, setCheckingInteractions] = useState(false);
   const [interactionCheckError, setInteractionCheckError] = useState(null);
 
+  // Synchronous mirror of state.medications. state.medications is only ever
+  // updated by the realtime postgres_changes echo (see subscription effect
+  // below), which round-trips through Supabase and isn't available right
+  // after an insert resolves. addMedication reads this ref instead, so a
+  // second medication added moments after the first always sees it — even if
+  // the first one's realtime echo hasn't landed in state yet.
+  const medicationsRef = useRef(state.medications);
+  useEffect(() => {
+    medicationsRef.current = state.medications;
+  }, [state.medications]);
+
   // ── Initial fetch ──────────────────────────────────────────────────────────
   useEffect(() => {
     let cancelled = false;
@@ -236,10 +247,14 @@ export function MedicationProvider({ children }) {
 
   // ── Interaction checking ────────────────────────────────────────────────────
   function toInteractionRow(data, drugA, drugB) {
+    const nameA = data.pair?.drugA ?? drugA;
+    const nameB = data.pair?.drugB ?? drugB;
+    const [sortedA, sortedB] = nameA.localeCompare(nameB, undefined, { sensitivity: 'base' }) <= 0
+      ? [nameA, nameB] : [nameB, nameA];
     return {
       patient_id: PATIENT_ID,
-      drug_a: data.pair?.drugA ?? drugA,
-      drug_b: data.pair?.drugB ?? drugB,
+      drug_a: sortedA,
+      drug_b: sortedB,
       status: data.status ?? 'uncertain',
       severity: data.severity ?? 'unknown',
       headline: data.headline ?? '',
@@ -269,6 +284,17 @@ export function MedicationProvider({ children }) {
       })
     );
 
+    // Per-pair failures were previously silent — the aggregate check below
+    // only fires when EVERY pair fails. Log each rejection individually too.
+    results.forEach((result, i) => {
+      if (result.status === 'rejected') {
+        console.error(
+          `Interaction check failed for ${newMedName} + ${existingMeds[i].name}:`,
+          result.reason
+        );
+      }
+    });
+
     setCheckingInteractions(false);
     if (results.length > 0 && results.every(r => r.status === 'rejected')) {
       setInteractionCheckError(
@@ -290,7 +316,19 @@ export function MedicationProvider({ children }) {
     const { error } = await supabase.from('medications').insert(row);
     if (error) throw error;
 
-    const existingMeds = state.medications.filter(m => m.name);
+    // Read from the ref (not state.medications — see comment near its
+    // declaration) so this reflects every medication added so far this
+    // session, regardless of whether its realtime echo has landed yet.
+    const existingMeds = medicationsRef.current.filter(m => m.name);
+
+    // Optimistically mirror this insert into the ref immediately, so the
+    // *next* addMedication call in this session sees it even before its own
+    // realtime echo arrives. Done after computing existingMeds above, so
+    // this medication is never checked against itself.
+    if (!medicationsRef.current.find(m => m.id === row.id)) {
+      medicationsRef.current = [...medicationsRef.current, row];
+    }
+
     runInteractionChecks(med.name, existingMeds);
   }
 
