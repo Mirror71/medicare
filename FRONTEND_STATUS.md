@@ -135,3 +135,10 @@ When applying any external (e.g. ChatGPT) design, do **not** implement these lit
 4. Do a real **browser pass at 375px** and confirm Realtime is on.
 5. Add a **README** + `.env.example` (client & server) so the repo is runnable by
    others (currently missing).
+
+
+
+
+
+
+

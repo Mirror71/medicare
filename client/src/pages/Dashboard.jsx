@@ -114,7 +114,7 @@ export default function Dashboard() {
       <Header navigate={navigate} />
 
       {/* Adherence strip */}
-      <div className="mt-3 rounded-xl bg-white px-4 py-3 text-lg shadow-sm">
+      <div className="mt-3 rounded-3xl bg-white p-5 shadow-sm">
         {dueCount === 0 ? (
           <span className="text-[var(--color-uncertain-text)]">No doses due yet today</span>
         ) : (
@@ -133,7 +133,7 @@ export default function Dashboard() {
       {/* All-done banner */}
       {allDone && (
         <div className="mt-3 rounded-xl border border-green-200 bg-[#F0FDF4] px-4 py-3 text-lg font-semibold text-[var(--color-safe)]">
-          ✓ All done for now!
+          All doses taken today 🎉
         </div>
       )}
 
@@ -178,7 +178,7 @@ export default function Dashboard() {
       )}
 
       {/* Time-grouped dose cards */}
-      <div className="mt-4 flex flex-col gap-6 pb-8">
+      <div className="mt-6 flex flex-col gap-8 pb-32">
         {SECTIONS.map(({ key, label, icon }) => {
           const slots = todaysSchedule[key] ?? []
           if (slots.length === 0) return null
@@ -211,7 +211,7 @@ function Header({ navigate }) {
       <button
         type="button"
         onClick={() => navigate('/add')}
-        className="min-h-12 shrink-0 rounded-xl bg-[var(--color-primary)] px-4 text-lg font-semibold text-white"
+        className="min-h-12 shrink-0 min-h-14 rounded-2xl bg-[var(--color-primary)] px-6 text-lg font-semibold text-white shadow-sm"
       >
         + Add medicine
       </button>
