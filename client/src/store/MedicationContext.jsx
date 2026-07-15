@@ -1,5 +1,6 @@
-import { createContext, useContext, useReducer, useEffect, useMemo } from 'react';
+import { createContext, useContext, useReducer, useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { callGemma } from '../lib/apiClient';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 export const PATIENT_ID = 'demo_patient';
@@ -122,6 +123,8 @@ const MedicationContext = createContext(null);
 
 export function MedicationProvider({ children }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [checkingInteractions, setCheckingInteractions] = useState(false);
+  const [interactionCheckError, setInteractionCheckError] = useState(null);
 
   // ── Initial fetch ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -231,6 +234,49 @@ export function MedicationProvider({ children }) {
     };
   }, []);
 
+  // ── Interaction checking ────────────────────────────────────────────────────
+  function toInteractionRow(data, drugA, drugB) {
+    return {
+      patient_id: PATIENT_ID,
+      drug_a: data.pair?.drugA ?? drugA,
+      drug_b: data.pair?.drugB ?? drugB,
+      status: data.status ?? 'uncertain',
+      severity: data.severity ?? 'unknown',
+      headline: data.headline ?? '',
+      explanation: data.explanation ?? '',
+      mechanism: data.mechanism ?? null,
+      recommendation: data.recommendation ?? '',
+      confidence: data.confidence ?? 'low',
+      is_uncertain: data.isUncertain ?? true,
+      uncertainty_reason: data.uncertaintyReason ?? null,
+      acknowledged_at: null,
+    };
+  }
+
+  async function runInteractionChecks(newMedName, existingMeds) {
+    if (existingMeds.length === 0) return;
+    setCheckingInteractions(true);
+    setInteractionCheckError(null);
+
+    const results = await Promise.allSettled(
+      existingMeds.map(async (med) => {
+        const data = await callGemma('interaction', { drugA: newMedName, drugB: med.name });
+        const row = toInteractionRow(data, newMedName, med.name);
+        const { error } = await supabase
+          .from('interactions')
+          .upsert(row, { onConflict: 'patient_id,drug_a,drug_b' });
+        if (error) throw error;
+      })
+    );
+
+    setCheckingInteractions(false);
+    if (results.length > 0 && results.every(r => r.status === 'rejected')) {
+      setInteractionCheckError(
+        'Interaction check could not be completed — please try again or consult your pharmacist.'
+      );
+    }
+  }
+
   // ── Actions ────────────────────────────────────────────────────────────────
   async function addMedication(med) {
     const id = crypto.randomUUID();
@@ -243,16 +289,24 @@ export function MedicationProvider({ children }) {
     };
     const { error } = await supabase.from('medications').insert(row);
     if (error) throw error;
-    // Realtime will fire MED_INSERT — no optimistic dispatch needed
+
+    const existingMeds = state.medications.filter(m => m.name);
+    runInteractionChecks(med.name, existingMeds);
   }
 
   async function updateMedication(id, updates) {
+    const oldMed = state.medications.find(m => m.id === id);
     const { error } = await supabase
       .from('medications')
       .update({ ...updates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .eq('patient_id', PATIENT_ID);
     if (error) throw error;
+
+    if (oldMed && updates.name && updates.name !== oldMed.name) {
+      const otherMeds = state.medications.filter(m => m.id !== id && m.name);
+      runInteractionChecks(updates.name, otherMeds);
+    }
   }
 
   async function deleteMedication(id) {
@@ -397,6 +451,11 @@ export function MedicationProvider({ children }) {
     doseLogs: state.doseLogs,
     loading: state.loading,
     error: state.error,
+
+    // Interaction check state
+    checkingInteractions,
+    interactionCheckError,
+    dismissInteractionError: () => setInteractionCheckError(null),
 
     // Actions
     addMedication,

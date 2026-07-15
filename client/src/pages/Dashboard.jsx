@@ -41,6 +41,9 @@ export default function Dashboard() {
     missedDoses,
     activeWarnings,
     highestSeverity,
+    checkingInteractions,
+    interactionCheckError,
+    dismissInteractionError,
   } = useMedication()
 
   const allSlots = useMemo(
@@ -149,6 +152,29 @@ export default function Dashboard() {
           ⚠ {activeWarnings.length} possible interaction warning
           {activeWarnings.length === 1 ? '' : 's'} — tap to review
         </Link>
+      )}
+
+      {/* Interaction check in progress */}
+      {checkingInteractions && (
+        <div className="mt-3 flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-lg text-[var(--color-uncertain-text)] shadow-sm">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-[var(--color-primary)]" />
+          Checking interactions…
+        </div>
+      )}
+
+      {/* Interaction check error */}
+      {interactionCheckError && (
+        <div className="mt-3 flex items-center justify-between gap-2 rounded-xl bg-[#FFFBEB] px-4 py-3 text-lg text-[var(--color-caution)] shadow-sm">
+          <span>{interactionCheckError}</span>
+          <button
+            type="button"
+            aria-label="Dismiss"
+            onClick={dismissInteractionError}
+            className="shrink-0 text-xl leading-none"
+          >
+            ✕
+          </button>
+        </div>
       )}
 
       {/* Time-grouped dose cards */}

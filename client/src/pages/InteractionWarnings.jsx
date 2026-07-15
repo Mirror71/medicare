@@ -166,14 +166,33 @@ export default function InteractionWarnings() {
             No interaction checks yet.
           </p>
         ) : (
-          allInteractions.map((row) => (
-            <InteractionCard
-              key={row.id ?? pairKey(row.drug_a, row.drug_b)}
-              interaction={row}
-              acknowledged={isAcked(row)}
-              onAcknowledge={row.id ? () => handleAcknowledge(row) : undefined}
-            />
-          ))
+          <>
+            {/* Active warnings */}
+            {allInteractions.filter((r) => !isAcked(r)).map((row) => (
+              <InteractionCard
+                key={row.id ?? pairKey(row.drug_a, row.drug_b)}
+                interaction={row}
+                acknowledged={false}
+                onAcknowledge={row.id ? () => handleAcknowledge(row) : undefined}
+              />
+            ))}
+
+            {/* Past warnings */}
+            {allInteractions.some((r) => isAcked(r)) && (
+              <div className="mt-4">
+                <h2 className="mb-2 text-lg font-semibold text-slate-400">Past warnings</h2>
+                <div className="flex flex-col gap-3 opacity-60">
+                  {allInteractions.filter((r) => isAcked(r)).map((row) => (
+                    <InteractionCard
+                      key={row.id ?? pairKey(row.drug_a, row.drug_b)}
+                      interaction={row}
+                      acknowledged={true}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>
