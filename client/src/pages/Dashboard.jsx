@@ -180,25 +180,15 @@ export default function Dashboard() {
 
 function Header({ navigate }) {
   return (
-    <header className="sticky top-0 z-30 -mx-4 bg-[var(--color-bg)] px-4 py-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">{formattedDate()}</h1>
-        <button
-          type="button"
-          onClick={() => navigate('/add')}
-          className="min-h-12 shrink-0 rounded-xl bg-[var(--color-primary)] px-4 text-lg font-semibold text-white"
-        >
-          + Add medicine
-        </button>
-      </div>
-      <nav className="mt-2 flex gap-5">
-        <Link to="/caregiver" className="text-lg text-[var(--color-primary)] underline">
-          👁️ Caregiver view
-        </Link>
-        <Link to="/chat" className="text-lg text-[var(--color-primary)] underline">
-          💬 How do I feel?
-        </Link>
-      </nav>
+    <header className="sticky top-0 z-30 -mx-4 flex items-center justify-between gap-3 bg-[var(--color-bg)] px-4 py-4">
+      <h1 className="text-2xl font-bold">{formattedDate()}</h1>
+      <button
+        type="button"
+        onClick={() => navigate('/add')}
+        className="min-h-12 shrink-0 rounded-xl bg-[var(--color-primary)] px-4 text-lg font-semibold text-white"
+      >
+        + Add medicine
+      </button>
     </header>
   )
 }

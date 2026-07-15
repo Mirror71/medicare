@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { mockRotation } from '../mocks/symptoms'
 
 function nowTime() {
@@ -59,7 +60,10 @@ export default function SymptomChat() {
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col px-4 pt-6 pb-44">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-[var(--color-primary)]">How are you feeling?</h1>
+        <Link to="/dashboard" className="inline-block min-h-12 py-2 text-lg text-[var(--color-primary)] underline">
+          ← Back to my medicines
+        </Link>
+        <h1 className="mt-1 text-3xl font-bold text-[var(--color-primary)]">How are you feeling?</h1>
         <p className="mt-1 text-lg text-[var(--color-uncertain-text)]">
           Describe your symptoms — we'll check if they might relate to your medicines.
         </p>
