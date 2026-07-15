@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme {
+  --color-bg: #F8FAFC;
+  --color-text: #0F172A;
+  --color-primary: #0369A1;
+  --color-safe: #15803D;
+  --color-caution: #B45309;
+  --color-danger: #B91C1C;
+  --color-uncertain: #6366F1;
+  --color-uncertain-text: #475569;
+}
+
+html {
+  font-size: 18px;
+}
+
+body {
+  min-height: 100vh;
+  font-size: 18px;
+  line-height: 1.6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+button,
+a[role="button"],
+input[type="button"],
+input[type="submit"],
+select,
+[role="button"] {
+  min-height: 48px;
+  min-width: 48px;
+}
